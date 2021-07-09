@@ -9,8 +9,10 @@ CREATE TABLE IF NOT EXISTS tasks (
   PRIMARY KEY (id)
 )
 
+-- see table
+DESCRIBE  tasks
 
 INSERT INTO tasks (title, description) VALUES 
-  ('task 1', 'only test')
+  ('task 1', 'only test'),
   ('task 2', 'only test')
 
