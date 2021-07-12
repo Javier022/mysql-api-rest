@@ -1,12 +1,4 @@
 const app = require("./app");
-const cors = require("cors");
-
-var corsOptions = {
-  origin: "*",
-  optionssuccessStatus: 200,
-};
-
-app.use(cors(corsOptions));
 
 app.get("/", (req, res) => {
   res.send("200");

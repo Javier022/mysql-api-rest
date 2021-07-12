@@ -1,5 +1,5 @@
 const getTasks = "SELECT * FROM tasks",
-  getTaskById = "SELECT * FROM tasks  WHERE id=:id",
+  getTaskById = "SELECT * FROM tasks  WHERE id=?",
   getAllTasks = "SELECT COUNT (id) FROM tasks",
   createNewTask =
     "INSERT INTO tasks (title, description) VALUES (:title, :description)",

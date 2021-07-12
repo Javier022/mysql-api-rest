@@ -3,13 +3,15 @@ const { getConnection, querys } = require("../database/index");
 const getTasks = async (req, res) => {
   try {
     const pool = await getConnection();
-    const result = await pool.execute(querys.getTasks);
+    const [rows] = await pool.query(querys.getTasks);
 
     res.status(200);
     res.json({
       succes: true,
-      tasks: result[0],
+      tasks: rows,
     });
+
+    pool.end();
   } catch (error) {
     res.status(500);
     res.send(error.message);
@@ -21,13 +23,22 @@ const getTaskById = async (req, res) => {
 
   try {
     const pool = await getConnection();
-    const result = await pool.execute(querys.getTaskById, { id: id });
+    const [rows] = await pool.query(querys.getTaskById, [id]);
+
+    if (rows[0] === undefined) {
+      return res.status(404).json({
+        succes: false,
+        message: "task doesn't exist",
+      });
+    }
 
     res.status(200);
     res.json({
       succes: true,
-      task: result[0][0],
+      task: rows[0],
     });
+
+    pool.end();
   } catch (error) {
     res.status(500);
     res.send(error.message);
@@ -44,6 +55,8 @@ const getTotalTasks = async (req, res) => {
       succes: true,
       tasks: result[0][0]["COUNT (id)"],
     });
+
+    pool.end();
   } catch (error) {
     res.status(500);
     res.send(error.message);
@@ -70,10 +83,13 @@ const createTask = async (req, res) => {
     res.status(200).json({
       succes: true,
       task: {
+        id: result[0]["insertId"],
         title,
         description,
       },
     });
+
+    pool.end();
   } catch (error) {
     res.status(500);
     res.send(error.message);
@@ -87,10 +103,20 @@ const deleteTask = async (req, res) => {
     const pool = await getConnection();
     const result = await pool.execute(querys.deleteTaskById, { id: id });
 
+    if (result[0]["affectedRows"] === 0) {
+      return res.status(404).json({
+        succes: false,
+        message: "task not found, 0 rows affected",
+      });
+    }
+
     res.status(200).json({
       succes: true,
       message: "task deleted",
+      id_task: id,
     });
+
+    pool.end();
   } catch (error) {
     res.status(500).send(error.message);
   }
@@ -115,13 +141,22 @@ const updateTask = async (req, res) => {
       id: id,
     });
 
+    if (!result[0]["affectedRows"]) {
+      return res.status(404).json({
+        succes: false,
+        message: "task not found, 0 rows affected",
+      });
+    }
+
     res.status(200).json({
       succes: true,
-      product: {
+      task: {
         title,
         description,
       },
     });
+
+    pool.end();
   } catch (error) {
     res.status(500).send(error.message);
   }
