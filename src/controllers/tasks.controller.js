@@ -3,11 +3,13 @@ const { getConnection, querys } = require("../database/index");
 const getTasks = async (req, res) => {
   try {
     const pool = await getConnection();
-    const [rows] = await pool.query(querys.getTasks);
+    const [rows] = await pool.query(querys.getTasks, [req.user.id]);
+
+    console.log(req.user);
 
     res.status(200);
     res.json({
-      succes: true,
+      success: true,
       tasks: rows,
     });
 
@@ -23,18 +25,18 @@ const getTaskById = async (req, res) => {
 
   try {
     const pool = await getConnection();
-    const [rows] = await pool.query(querys.getTaskById, [id]);
+    const [rows] = await pool.query(querys.getTaskById, [req.user.id, id]);
 
     if (rows[0] === undefined) {
       return res.status(404).json({
-        succes: false,
+        success: false,
         message: "task doesn't exist",
       });
     }
 
     res.status(200);
     res.json({
-      succes: true,
+      success: true,
       task: rows[0],
     });
 
@@ -48,11 +50,13 @@ const getTaskById = async (req, res) => {
 const getTotalTasks = async (req, res) => {
   try {
     const pool = await getConnection();
-    const result = await pool.execute(querys.getAllTasks);
+    const result = await pool.execute(querys.getAllTasks, {
+      user_id: req.user.id,
+    });
 
     res.status(200);
     res.json({
-      succes: true,
+      success: true,
       tasks: result[0][0]["COUNT (id)"],
     });
 
@@ -68,7 +72,7 @@ const createTask = async (req, res) => {
 
   if (!title.trim()) {
     return res.status(400).json({
-      succes: false,
+      success: false,
       message: "bad request, please fill field title",
     });
   }
@@ -78,10 +82,11 @@ const createTask = async (req, res) => {
     const result = await pool.execute(querys.createNewTask, {
       title: title,
       description: description,
+      user_id: req.user.id,
     });
 
     res.status(200).json({
-      succes: true,
+      success: true,
       task: {
         id: result[0]["insertId"],
         title,
@@ -101,17 +106,20 @@ const deleteTask = async (req, res) => {
 
   try {
     const pool = await getConnection();
-    const result = await pool.execute(querys.deleteTaskById, { id: id });
+    const result = await pool.execute(querys.deleteTaskById, {
+      id: id,
+      user_id: req.user.id,
+    });
 
     if (result[0]["affectedRows"] === 0) {
       return res.status(404).json({
-        succes: false,
+        success: false,
         message: "task not found, 0 rows affected",
       });
     }
 
     res.status(200).json({
-      succes: true,
+      success: true,
       message: "task deleted",
       id_task: id,
     });
@@ -128,7 +136,7 @@ const updateTask = async (req, res) => {
 
   if (!(title.trim() && description.trim())) {
     return res.status(400).json({
-      succes: false,
+      success: false,
       message: "bad request, please fill all fields",
     });
   }
@@ -139,17 +147,18 @@ const updateTask = async (req, res) => {
       title: title,
       description: description,
       id: id,
+      user_id: req.user.id,
     });
 
     if (!result[0]["affectedRows"]) {
       return res.status(404).json({
-        succes: false,
+        success: false,
         message: "task not found, 0 rows affected",
       });
     }
 
     res.status(200).json({
-      succes: true,
+      success: true,
       task: {
         title,
         description,

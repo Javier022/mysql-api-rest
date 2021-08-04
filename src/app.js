@@ -34,8 +34,14 @@ app.use(morgan("dev"));
 app.use("/docs", swaggerIU.serve, swaggerIU.setup(espesifications));
 
 // routes
+const authRoutes = require("./routes/auth.routes");
 const tasksRoutes = require("./routes/tasks.routes");
 
-app.use(tasksRoutes);
+// middlewares
+const validateToken = require("./middleware/validate-token");
+
+app.use("/user", authRoutes);
+
+app.use("/", validateToken, tasksRoutes);
 
 module.exports = app;
