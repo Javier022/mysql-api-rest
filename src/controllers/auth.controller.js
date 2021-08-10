@@ -10,6 +10,7 @@ const schemaRegister = Joi.object({
   username: Joi.string().min(3).max(100).required(),
   email: Joi.string().min(6).max(100).required().email(),
   password: Joi.string().min(6).max(100).required(),
+  rol: Joi.string().min(4).max(100),
 });
 
 const schemaLogin = Joi.object({
@@ -28,6 +29,7 @@ const userRegister = async (req, res) => {
   }
 
   const pool = await getConnection();
+
   const [rows] = await pool.query(
     `SELECT * FROM users WHERE email LIKE '${req.body.email}%'`
   );
@@ -39,13 +41,37 @@ const userRegister = async (req, res) => {
     });
   }
 
+  let rol = req.body.rol;
+  if (rol) {
+    const roles = await pool.query(`SELECT * FROM roles`);
+
+    const existRole = roles[0].find((item) => {
+      return item.name === rol;
+    });
+
+    if (!existRole) {
+      return res.status(500).json({
+        success: false,
+        message: "rol doesn't exist",
+      });
+    }
+
+    rol = existRole.id;
+  } else {
+    rol = 3;
+  }
+
   const salt = await bcrypt.genSalt(10);
   const hashPassword = await bcrypt.hash(req.body.password, salt);
 
   try {
     const { username, email } = req.body;
-    const pool = await getConnection();
-    await pool.query(querysAuth.createUser, [username, email, hashPassword]);
+    await pool.query(querysAuth.createUser, [
+      username,
+      email,
+      hashPassword,
+      rol,
+    ]);
 
     res.status(200).json({
       success: true,
@@ -94,10 +120,12 @@ const userLogin = async (req, res) => {
 
   const userForToken = {
     id: rows[0].id,
-    username: rows[0].username,
+    rol_id: rows[0].rol_id,
   };
 
-  const token = jwt.sign(userForToken, process.env.SECRET_KEY);
+  const token = jwt.sign(userForToken, process.env.SECRET_KEY, {
+    expiresIn: 60 * 60 * 24,
+  });
 
   res.header("auth-token", token).json({
     success: true,

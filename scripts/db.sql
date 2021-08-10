@@ -9,6 +9,9 @@ CREATE TABLE IF NOT EXISTS users (
   password varchar(100) NOT NULL,
   fullname varchar(255),
   created_at timestamp NOT NULL DEFAULT current_timestamp,
+  state BOOLEAN NOT NULL DEFAULT true,
+  rol_id INT(11) NOT NULL,
+  CONSTRAINT fk_rol FOREIGN KEY (rol_id) REFERENCES roles(id),
   PRIMARY KEY(id)
 );
 
@@ -23,6 +26,20 @@ CREATE TABLE IF NOT EXISTS tasks (
   PRIMARY KEY(id)
 );
 
+
+CREATE TABLE IF NOT EXISTS  roles (
+  id INT(11)  NOT NULL AUTO_INCREMENT,
+  name varchar(100) NOT NULL,
+  PRIMARY KEY(id)
+);
+
+
+
+ALTER TABLE users 
+  ADD state BOOLEAN NOT NULL DEFAULT true,
+  ADD rol_id INT(11) NOT NULL,
+  ADD CONSTRAINT fk_rol FOREIGN KEY (rol_id) REFERENCES roles(id);
+  
 
 -- CONSTRAINT para indicar que un determinado campo debe de cumplir 
 -- con las indicaciones requeridas para que la accion no se cancele

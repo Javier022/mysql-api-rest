@@ -1,19 +1,31 @@
 const express = require("express");
 const config = require("./config");
-const app = express();
 const cors = require("cors");
 const morgan = require("morgan");
 const swaggerJSDoc = require("swagger-jsdoc");
 const swaggerIU = require("swagger-ui-express");
 const swaggerOptions = require("./swaggerOptions");
 
+// routes
+const authRoutes = require("./routes/auth.routes");
+const tasksRoutes = require("./routes/tasks.routes");
+const adminRoutes = require("./routes/admin.routes");
+const moderatorRoutes = require("./routes/moderator.routes");
+
+// middlewares
+const validateToken = require("./middleware/validate-token");
+const { isAdmin, isModerator } = require("./middleware/validate-rol");
+
+// swagger conf
+const espesifications = swaggerJSDoc(swaggerOptions);
+
+// cors conf
 var corsOptions = {
   origin: "*",
   optionssuccessStatus: 200,
 };
 
-// swagger conf
-const espesifications = swaggerJSDoc(swaggerOptions);
+const app = express();
 
 // settings
 app.set("port", config.port);
@@ -34,14 +46,9 @@ app.use(morgan("dev"));
 app.use("/docs", swaggerIU.serve, swaggerIU.setup(espesifications));
 
 // routes
-const authRoutes = require("./routes/auth.routes");
-const tasksRoutes = require("./routes/tasks.routes");
-
-// middlewares
-const validateToken = require("./middleware/validate-token");
-
-app.use("/user", authRoutes);
-
+app.use("/admin", [validateToken, isAdmin], adminRoutes);
+app.use("/moderator", [validateToken, isModerator], moderatorRoutes);
+app.use("/", authRoutes);
 app.use("/", validateToken, tasksRoutes);
 
 module.exports = app;
