@@ -1,10 +1,9 @@
 # mysql-api-rest
 Backend with MySQL
 
-https://mysql-api-hrz09.herokuapp.com
+https://mysql-api-hrz09.herokuapp.com 
 
-#Documentation
+# Documentation
 
-https://mysql-api-hrz09.herokuapp.com/docs
-
+in updating ...
 
