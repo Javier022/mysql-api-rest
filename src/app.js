@@ -15,6 +15,7 @@ const moderatorRoutes = require("./routes/moderator.routes");
 // middlewares
 const validateToken = require("./middleware/validate-token");
 const { isAdmin, isModerator } = require("./middleware/validate-rol");
+const { validateState } = require("./middleware/validate-state");
 
 // swagger conf
 const espesifications = swaggerJSDoc(swaggerOptions);
@@ -46,9 +47,13 @@ app.use(morgan("dev"));
 app.use("/docs", swaggerIU.serve, swaggerIU.setup(espesifications));
 
 // routes
-app.use("/admin", [validateToken, isAdmin], adminRoutes);
-app.use("/moderator", [validateToken, isModerator], moderatorRoutes);
 app.use("/", authRoutes);
-app.use("/", validateToken, tasksRoutes);
+app.use("/admin", [validateToken, isAdmin], adminRoutes);
+app.use(
+  "/moderator",
+  [validateToken, isModerator, validateState],
+  moderatorRoutes
+);
+app.use("/", [validateToken, validateState], tasksRoutes);
 
 module.exports = app;

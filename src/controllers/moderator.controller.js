@@ -1,8 +1,21 @@
-const contentModerator = (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: "Welcome Moderator",
-  });
+const { getConnection } = require("../database/index");
+const { getUsers } = require("../database/querysModerator");
+
+const contentModerator = async (req, res) => {
+  try {
+    const pool = await getConnection();
+    const users = await pool.query(getUsers, [3]);
+
+    res.status(200).json({
+      success: true,
+      data: users[0],
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
 };
 
 module.exports = {

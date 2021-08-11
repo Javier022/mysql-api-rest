@@ -121,6 +121,7 @@ const userLogin = async (req, res) => {
   const userForToken = {
     id: rows[0].id,
     rol_id: rows[0].rol_id,
+    state: rows[0].state,
   };
 
   const token = jwt.sign(userForToken, process.env.SECRET_KEY, {
