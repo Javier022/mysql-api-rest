@@ -1,7 +1,9 @@
+const { admin, moderator } = require("../lib/roles");
+
 const isAdmin = (req, res, next) => {
   const rol = req.user.rol_id;
 
-  if (rol !== 1) {
+  if (rol !== admin) {
     return res.status(400).json({
       success: false,
       message: "required admin rol",
@@ -13,7 +15,7 @@ const isAdmin = (req, res, next) => {
 
 const isModerator = async (req, res, next) => {
   const rol = req.user.rol_id;
-  if (rol !== 2) {
+  if (rol !== moderator) {
     return res.status(400).json({
       success: false,
       message: "required moderator rol",

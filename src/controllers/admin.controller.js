@@ -1,10 +1,11 @@
 const { getConnection } = require("../database/index");
 const { getUsers, deleteUserById } = require("../database/querysAdmin");
+const { admin } = require("../lib/roles");
 
 const contentAdmin = async (req, res) => {
   try {
     const pool = await getConnection();
-    const users = await pool.query(getUsers, [1]);
+    const users = await pool.query(getUsers, [admin]);
 
     res.status(200).json({
       success: true,

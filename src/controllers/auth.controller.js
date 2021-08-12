@@ -1,5 +1,5 @@
-const { getConnection } = require("../database/index");
-const { querysAuth } = require("../database/index");
+const { getConnection, querysAuth } = require("../database/index");
+const { user } = require("../lib/roles");
 
 // libraries
 const Joi = require("joi");
@@ -58,7 +58,7 @@ const userRegister = async (req, res) => {
 
     rol = existRole.id;
   } else {
-    rol = 3;
+    rol = user;
   }
 
   const salt = await bcrypt.genSalt(10);

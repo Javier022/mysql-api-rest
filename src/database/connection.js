@@ -12,8 +12,6 @@ const getConnection = async () => {
 
     connection.config.namedPlaceholders = true;
 
-    console.log("conexion exitosa");
-
     return connection;
   } catch (error) {
     throw new Error(error);
