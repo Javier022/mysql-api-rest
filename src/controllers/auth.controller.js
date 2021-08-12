@@ -37,7 +37,7 @@ const userRegister = async (req, res) => {
   if (rows && rows.length !== 0) {
     return res.status(400).json({
       success: false,
-      message: "email ya registrado",
+      message: "Email already registered",
     });
   }
 
@@ -75,7 +75,7 @@ const userRegister = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "usuario registrado",
+      message: "registered user",
       data: {
         username,
         email,
@@ -104,7 +104,7 @@ const userLogin = async (req, res) => {
   if (!(rows && rows.length !== 0)) {
     return res.status(200).json({
       success: false,
-      message: "usuario no encontrado",
+      message: "user not found",
     });
   }
 
@@ -114,7 +114,7 @@ const userLogin = async (req, res) => {
   if (!validPassword) {
     return res.status(200).json({
       success: false,
-      message: "contraseña incorrecta",
+      message: "incorrect password",
     });
   }
 
