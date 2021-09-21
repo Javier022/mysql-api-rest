@@ -19,4 +19,4 @@ npm run build
 ```
 
 ### Documentation
-See https://mysql-api-hrz09.herokuapp.com/docs/
+in update...
