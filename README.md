@@ -1,9 +1,22 @@
-# mysql-api-rest
-Backend with MySQL
+# Node Js & MySQL 
 
-https://mysql-api-hrz09.herokuapp.com 
+Backend with db MySQL
 
-# Documentation
+## Install the dependencies
+```bash
+npm install
+```
 
-in updating ...
+### Start the app in development mode (hot-code reloading, error reporting, etc.)
+```bash
+npm run dev
+```
 
+
+### Build the app for production
+```bash
+npm run build
+```
+
+### Documentation
+in update...
