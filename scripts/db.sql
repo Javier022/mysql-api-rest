@@ -36,9 +36,9 @@ CREATE TABLE IF NOT EXISTS  roles (
 
 
 ALTER TABLE users 
-  ADD state BOOLEAN NOT NULL DEFAULT true,
-  ADD rol_id INT(11) NOT NULL,
-  ADD CONSTRAINT fk_rol FOREIGN KEY (rol_id) REFERENCES roles(id);
+  ADD country varchar(100) 
+  ADD about varchar(255) 
+ 
   
 
 -- CONSTRAINT para indicar que un determinado campo debe de cumplir 

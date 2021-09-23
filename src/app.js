@@ -8,6 +8,7 @@ const swaggerOptions = require("./swaggerOptions");
 
 // routes
 const authRoutes = require("./routes/auth.routes");
+const profileRoutes = require("./routes/profile.routes");
 const tasksRoutes = require("./routes/tasks.routes");
 const adminRoutes = require("./routes/admin.routes");
 const moderatorRoutes = require("./routes/moderator.routes");
@@ -48,12 +49,17 @@ app.use("/docs", swaggerIU.serve, swaggerIU.setup(espesifications));
 
 // routes
 app.use("/", authRoutes);
+
+app.use("/profile", profileRoutes);
+
+app.use("/", [validateToken, validateState], tasksRoutes);
+
 app.use("/admin", [validateToken, isAdmin], adminRoutes);
+
 app.use(
   "/moderator",
   [validateToken, isModerator, validateState],
   moderatorRoutes
 );
-app.use("/", [validateToken, validateState], tasksRoutes);
 
 module.exports = app;

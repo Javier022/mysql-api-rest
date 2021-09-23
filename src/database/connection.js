@@ -12,6 +12,7 @@ const getConnection = async () => {
 
     connection.config.namedPlaceholders = true;
 
+    console.log("connect to db");
     return connection;
   } catch (error) {
     throw new Error(error);

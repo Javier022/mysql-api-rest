@@ -5,8 +5,7 @@ const getTasks = async (req, res) => {
     const pool = await getConnection();
     const [rows] = await pool.query(querys.getTasks, [req.user.id]);
 
-    res.status(200);
-    res.json({
+    res.status(200).json({
       success: true,
       tasks: rows,
     });
