@@ -1,5 +1,9 @@
 const router = require("express").Router();
-const { userRegister, userLogin } = require("../controllers/auth.controller");
+const {
+  userRegister,
+  userLogin,
+  refreshToken,
+} = require("../controllers/auth.controller");
 
 /**
  * @swagger
@@ -25,5 +29,7 @@ router.post("/register", userRegister);
  *    tags: [Authentication]
  */
 router.post("/login", userLogin);
+
+router.post("/refresh-token", refreshToken);
 
 module.exports = router;

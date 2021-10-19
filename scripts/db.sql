@@ -36,8 +36,8 @@ CREATE TABLE IF NOT EXISTS  roles (
 
 
 ALTER TABLE users 
-  ADD country varchar(100) 
-  ADD about varchar(255) 
+  ADD location varchar(100),
+  ADD bio varchar(255);
  
   
 

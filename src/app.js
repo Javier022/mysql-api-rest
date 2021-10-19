@@ -50,7 +50,7 @@ app.use("/docs", swaggerIU.serve, swaggerIU.setup(espesifications));
 // routes
 app.use("/", authRoutes);
 
-app.use("/profile", profileRoutes);
+app.use("/profile", [validateToken, validateState], profileRoutes);
 
 app.use("/", [validateToken, validateState], tasksRoutes);
 
