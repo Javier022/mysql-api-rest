@@ -11,6 +11,8 @@ const contentAdmin = async (req, res) => {
       success: true,
       data: users[0],
     });
+
+    pool.end();
   } catch (error) {
     res.status(500).json({
       success: false,

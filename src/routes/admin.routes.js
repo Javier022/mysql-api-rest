@@ -15,7 +15,7 @@ const { contentAdmin, deleteUser } = require("../controllers/admin.controller");
  *    summary: dashboard admin
  *    tags: [Admin]
  */
-router.get("/", contentAdmin);
+router.get("/users", contentAdmin);
 
 /**
  * @swagger

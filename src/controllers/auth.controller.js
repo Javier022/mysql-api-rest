@@ -1,5 +1,7 @@
 const { getConnection, querysAuth } = require("../database/index");
 const { user } = require("../lib/roles");
+const randomString = require("../lib/randomString");
+const sendMail = require("../config/emailer");
 
 // libraries
 const Joi = require("joi");
@@ -75,16 +77,23 @@ const userRegister = async (req, res) => {
       rol = user;
     }
 
+    const { username, email } = req.body;
+
     const salt = await bcrypt.genSalt(10);
     const hashPassword = await bcrypt.hash(req.body.password, salt);
 
-    const { username, email } = req.body;
+    // random text to validate email user regitered
+    const randomValue = randomString();
+
     await pool.query(querysAuth.createUser, [
       username,
       email,
       hashPassword,
       rol,
+      randomValue,
     ]);
+
+    sendMail(req.body, randomValue);
 
     res.status(200).json({
       success: true,
@@ -95,6 +104,7 @@ const userRegister = async (req, res) => {
       },
     });
 
+    // res.redirect("back");
     return pool.end();
   } catch (error) {
     return res.status(500).send(error.message);
@@ -113,19 +123,21 @@ const userLogin = async (req, res) => {
 
   try {
     const pool = await getConnection();
-    const [rows] = await pool.query(
+    const result = await pool.query(
       `SELECT * FROM users WHERE email LIKE '${req.body.email}%'`
     );
 
-    if (!(rows && rows.length !== 0)) {
-      // pool.end();
+    const user = result[0][0];
+
+    if (!(user && user.length !== 0)) {
+      pool.end();
       return res.status(200).json({
         success: false,
         message: "user not found",
       });
     }
 
-    const userPass = rows[0].password;
+    const userPass = user.password;
     const validPassword = await bcrypt.compare(req.body.password, userPass);
 
     if (!validPassword) {
@@ -136,10 +148,26 @@ const userLogin = async (req, res) => {
       });
     }
 
+    if (!user.state) {
+      pool.end();
+      return res.status(403).json({
+        success: false,
+        message: "user has been deleted",
+      });
+    }
+
+    if (!user.verified_email) {
+      pool.end();
+      return res.status(401).json({
+        success: false,
+        message: "the email has not been verified",
+      });
+    }
+
     const payload = {
-      id: rows[0].id,
-      rol_id: rows[0].rol_id,
-      state: rows[0].state,
+      id: user.id,
+      rol_id: user.rol_id,
+      state: user.state,
     };
 
     const token = jwt.sign(payload, process.env.SECRET_KEY, {
@@ -156,7 +184,7 @@ const userLogin = async (req, res) => {
       refreshToken: refreshToken,
     });
 
-    // return pool.end();
+    return pool.end();
   } catch (error) {
     res.status(500).send(error.message);
   }
@@ -199,8 +227,50 @@ const refreshToken = (req, res) => {
   });
 };
 
+const verifyEmail = async (req, res) => {
+  const { randomValue } = req.params;
+
+  try {
+    const pool = await getConnection();
+
+    const userExist = await pool.query(
+      `SELECT * FROM users WHERE hash_email LIKE ${randomValue}`
+    );
+
+    if (userExist[0][0].verified_email) {
+      pool.end();
+      return res.json({
+        message: "user has been verified",
+      });
+    }
+
+    if (userExist[0].length === 0) {
+      pool.end();
+      return res.status(404).json({
+        success: false,
+        message: "user not found",
+      });
+    }
+
+    const { id, email } = userExist[0][0];
+
+    await pool.query(querysAuth.activeEmail, [id]);
+
+    res.status(200).json({
+      success: true,
+      message: "verified email",
+      email,
+    });
+
+    return pool.end();
+  } catch (error) {
+    res.status(500).send("Internal error");
+  }
+};
+
 module.exports = {
   userRegister,
   userLogin,
   refreshToken,
+  verifyEmail,
 };

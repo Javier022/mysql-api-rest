@@ -38,7 +38,14 @@ CREATE TABLE IF NOT EXISTS  roles (
 ALTER TABLE users 
   ADD location varchar(100),
   ADD bio varchar(255);
+
+
+ALTER TABLE users
+  ADD verified_email BOOLEAN NOT NULL DEFAULT false;
  
+ALTER TABLE users
+  ADD hash_email varchar(255);
+
   
 
 -- CONSTRAINT para indicar que un determinado campo debe de cumplir 

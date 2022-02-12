@@ -3,6 +3,7 @@ const {
   userRegister,
   userLogin,
   refreshToken,
+  verifyEmail,
 } = require("../controllers/auth.controller");
 
 /**
@@ -31,5 +32,7 @@ router.post("/register", userRegister);
 router.post("/login", userLogin);
 
 router.post("/refresh-token", refreshToken);
+
+router.get("/verify/:randomValue", verifyEmail);
 
 module.exports = router;
