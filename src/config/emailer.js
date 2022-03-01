@@ -1,7 +1,7 @@
 const nodemailer = require("nodemailer");
 const template = require("../lib/templateEmail");
 
-const createTrans = () => {
+const createTransporter = () => {
   const transport = nodemailer.createTransport({
     host: "smtp.gmail.com",
     port: 465,
@@ -17,13 +17,16 @@ const createTrans = () => {
 
 const sendMail = async (user, randomValue) => {
   try {
-    const transporter = createTrans();
+    const transporter = createTransporter();
 
     const info = await transporter.sendMail({
-      from: '"TodoApp ✔" <hrzjavier09@gmail.com>', // sender address
+      from: `"TodoApp ✔" <${process.env.EMAIL}>`, // sender address
       to: user.email, // list of receivers
       subject: `Email confirmation`,
-      html: template(user.username, `${process.env.API}/verify/${randomValue}`),
+      html: template(
+        user.username,
+        `${process.env.CLIENT}/confirm/${randomValue}`
+      ),
     });
 
     return info;

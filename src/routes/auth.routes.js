@@ -1,9 +1,12 @@
 const router = require("express").Router();
+
 const {
   userRegister,
   userLogin,
   refreshToken,
   verifyEmail,
+  registerWithGoogle,
+  resendEmail,
 } = require("../controllers/auth.controller");
 
 /**
@@ -33,6 +36,10 @@ router.post("/login", userLogin);
 
 router.post("/refresh-token", refreshToken);
 
-router.get("/verify/:randomValue", verifyEmail);
+router.get("/verify-email/:randomValue", verifyEmail);
+
+router.post("/auth/google", registerWithGoogle);
+
+router.post("/resend-email", resendEmail);
 
 module.exports = router;
