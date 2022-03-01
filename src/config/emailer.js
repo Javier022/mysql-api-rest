@@ -7,7 +7,7 @@ const createTransporter = () => {
     port: 465,
     secure: true,
     auth: {
-      user: process.env.EMIAL,
+      user: process.env.EMAIL,
       pass: process.env.EMAILER_KEY,
     },
   });

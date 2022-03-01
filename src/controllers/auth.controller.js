@@ -213,7 +213,7 @@ const refreshToken = (req, res) => {
   if (!token) {
     return res.status(400).json({
       success: false,
-      message: "something that's wrong",
+      message: "something went wrong",
     });
   }
 
