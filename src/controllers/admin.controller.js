@@ -37,6 +37,7 @@ const deleteUser = async (req, res) => {
     const userDeleted = await pool.query(deleteUserById, [id]);
 
     if (!userDeleted[0].affectedRows) {
+      pool.end();
       return res.status(400).json({
         success: false,
         message: "user not found",
@@ -47,6 +48,8 @@ const deleteUser = async (req, res) => {
       success: true,
       message: "user deleted",
     });
+
+    pool.end();
   } catch (error) {
     res.status(500).json({
       success: false,

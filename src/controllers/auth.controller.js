@@ -358,6 +358,7 @@ const registerWithGoogle = async (req, res) => {
     );
 
     if (findUser[0].length === 0) {
+      pool.end();
       return res.status(400).json({
         success: false,
         message: "user not found",

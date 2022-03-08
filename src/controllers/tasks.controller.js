@@ -25,6 +25,7 @@ const getTaskById = async (req, res) => {
     const [rows] = await pool.query(querys.getTaskById, [req.user.id, id]);
 
     if (rows[0] === undefined) {
+      pool.end();
       return res.status(404).json({
         success: false,
         message: "task doesn't exist",
@@ -109,6 +110,7 @@ const deleteTask = async (req, res) => {
     });
 
     if (result[0]["affectedRows"] === 0) {
+      pool.end();
       return res.status(404).json({
         success: false,
         message: "task not found, 0 rows affected",
@@ -148,6 +150,7 @@ const updateTask = async (req, res) => {
     });
 
     if (!result[0]["affectedRows"]) {
+      pool.end();
       return res.status(404).json({
         success: false,
         message: "task not found, 0 rows affected",
