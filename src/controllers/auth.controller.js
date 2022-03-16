@@ -315,12 +315,20 @@ const registerWithGoogle = async (req, res) => {
     // db
     const pool = await getConnection();
 
-    const userAlreadyRegistered = await pool.query(
+    const user = await pool.query(
       `SELECT * FROM users WHERE email LIKE '${googleUser.email}'`
     );
 
-    if (userAlreadyRegistered[0].length !== 0) {
-      const userData = userAlreadyRegistered[0][0];
+    if (user[0].length !== 0) {
+      const userData = user[0][0];
+
+      if (!userData.state) {
+        pool.end();
+        return res.status(401).json({
+          success: false,
+          message: "user has been deleted",
+        });
+      }
 
       const payload = {
         id: userData.id,
