@@ -5,7 +5,7 @@ const { OAuth2Client } = require("google-auth-library");
 
 //
 const { getConnection, querysAuth } = require("../database/index");
-const { user } = require("../lib/roles");
+const { user: userRol } = require("../lib/roles");
 const randomString = require("../lib/randomString");
 const sendMail = require("../config/emailer");
 
@@ -42,7 +42,7 @@ const userRegister = async (req, res) => {
       pool.end();
       return res.status(200).json({
         success: false,
-        message: "Email already registered",
+        message: "email already registered",
       });
     }
 
@@ -75,7 +75,7 @@ const userRegister = async (req, res) => {
 
       rol = existRole.id;
     } else {
-      rol = user;
+      rol = userRol;
     }
 
     const { username, email } = req.body;
@@ -146,11 +146,19 @@ const userLogin = async (req, res) => {
 
     const user = result[0][0];
 
-    if (!(user && user.length !== 0)) {
+    if (!user) {
       pool.end();
       return res.status(200).json({
         success: false,
         message: "user not found",
+      });
+    }
+
+    if (!user.state) {
+      pool.end();
+      return res.status(401).json({
+        success: false,
+        message: "user has been disabled",
       });
     }
 
@@ -165,19 +173,11 @@ const userLogin = async (req, res) => {
       });
     }
 
-    if (!user.state) {
-      pool.end();
-      return res.status(403).json({
-        success: false,
-        message: "user has been deleted",
-      });
-    }
-
     if (!user.verified_email) {
       pool.end();
       return res.status(401).json({
         success: false,
-        message: "the email has not been verified",
+        message: "email not verified, please check your email",
       });
     }
 
@@ -326,7 +326,7 @@ const registerWithGoogle = async (req, res) => {
         pool.end();
         return res.status(401).json({
           success: false,
-          message: "user has been deleted",
+          message: "user has been desabled",
         });
       }
 
@@ -351,12 +351,12 @@ const registerWithGoogle = async (req, res) => {
       });
     }
 
-    // save user
+    // save user into db
     await pool.query(querysAuth.createUserWithGoogle, [
       googleUser.email,
       googleUser.email,
       true,
-      user,
+      userRol,
       googleUser.email_verified,
       googleUser.picture,
     ]);
@@ -397,7 +397,7 @@ const registerWithGoogle = async (req, res) => {
   } catch (e) {
     res.status(500).json({
       success: false,
-      message: "something went wrong",
+      message: "Internal error",
     });
   }
 };
